@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script
+    type="text/javascript"
+    src="/js/lib/dummy.js"
+    
+  ></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+  <style id="compiled-css" type="text/css">
+        center center {
+  font-family: sans-serif;
+  font-size: 0.8em;
+}
+
+table, td {
+  //border: 1px solid;
+  border-collapse: collapse;
+  
+	padding: 3px;
+}
+
+table {
+  //table-layout: fixed;
+  width: 100%;
+  max-width: 290px;
+}
+
+
+
+table tr:nth-child(even) tr, table tr:nth-child(even) {
+  background-color: #FFA;
+}
+
+tr td:nth-child(3) {
+  font-weight: bold;
+}
+
+
+    /* EOS */
+  </style>
+
+  <script id="insert"></script>
+
+</head>
+<body>
+    
+
+<center><center>
+  <table>
+<tbody id="tbody"></tbody>
+  
+</table>
+
+
+
+<script src="https://stupid-fast.com/gviz.js"></script>
+    <br>
+    <small>https://jsfiddle.net/schweissguth/6y9wroq7/</small>
+    <br>
+  <footer>
+    <br><br><br>
+  </footer>
+</center></center>
+
+
+    <script type="text/javascript">//<![CDATA[
+
+
+var PREVRACE = ""
+var PICKS = []
+var PLAYERS = []
+var COUNT = 22
+var DRIVERSobj = {}
+var RESULTS = []
+var PLAYERSobj = {}
+var PICKSobj = {}
+
+
+  gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "INFO", "select C", function(result) {
+  //console.log(result)
+  result.shift()
+  PREVRACE = result[0]
+  getResults()
+})
+
+function getResults() {
+  fetch("https://cf.nascar.com/live/feeds/series_1/" + PREVRACE + "/live_feed.json").then(function(x) {
+    return x.text()
+  }).then(function(y) {
+  	var parse = JSON.parse(y)
+    RESULTS = parse
+  	//console.log("RESULTS", RESULTS)
+    getPicks()
+  })
+}
+
+function getPicks() {
+gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "PICKS", "select A, B, C, D, E, F where B = " + PREVRACE, function(result) {
+  result.shift()
+  PICKS = result
+  //console.log("PICKS", PICKS)
+  getPlayers()
+})
+}
+
+function getPlayers() {
+gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "PLAYERS", "select A, B, C where C = TRUE", function(result) {
+  result.shift()
+  PLAYERS = result
+  //console.log("PLAYERS", PLAYERS)
+  mapPlayers()
+})
+}
+
+
+function mapPlayers() {
+	var obj = {}
+	PLAYERS.forEach(function(item) {
+  	obj[item[0]] = item[1]
+  })
+  PLAYERSobj = obj
+  //console.log("mapplayers", PLAYERSobj)
+  mapPicks()
+}
+
+function mapPicks() {
+	var obj = {}
+	PICKS.forEach(function(item) {
+  	obj[item[2]] = PLAYERSobj[item[3]]
+  })
+  PICKSobj = obj
+  //console.log("mappicks", PICKSobj)
+  makeTable()
+}
+
+
+function makeTable() {
+	RESULTS.vehicles.forEach(function(item, index) {
+    	var tr = tbody.insertRow()
+      tr.insertCell().innerHTML = index + 1
+      tr.insertCell().innerHTML = item.driver.full_name
+      tr.insertCell().id = "c" + item.vehicle_number
+    })
+    assignPlayers()
+}
+
+
+
+function assignPlayers() {
+	var trs = document.getElementsByTagName("TR")
+	for (var i in PICKSobj) {
+  	document.getElementById(i).innerHTML = PICKSobj[i] || ""
+  }
+  assignPts()
+}
+
+
+function assignPts() {
+	var trs = document.querySelectorAll("TR")
+  console.log(trs)
+  for (var i = 0; i < trs.length; i++) {
+  	var td2 = trs[i].insertCell()
+  	var td1 = trs[i].getElementsByTagName("TD")[2]
+  if (td1.innerText) {
+  	td2.innerText = COUNT--
+  }
+  }
+}
+
+
+  //]]></script>
+
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "6y9wroq7"
+      }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
+
+
+</body>
+</html>

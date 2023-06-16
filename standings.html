@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>SF Standings Page</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script
+    type="text/javascript"
+    src="/js/lib/dummy.js"
+    
+  ></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+  <style id="compiled-css" type="text/css">
+    table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  max-width: 290px;
+}
+
+table tr:nth-child(even) {
+  background: #FDF;
+}
+
+tr td:first-child {
+  width: 50px;
+  text-align: center
+}
+
+tr td:nth-child(2) {
+  font-weight: bold;
+}
+
+tr td:nth-child(3) {
+  width: 75px;
+  text-align: center;
+}
+
+    /* EOS */
+  </style>
+
+  <script id="insert"></script>
+
+</head>
+<body>
+    <center>
+  <center>
+    <script src="https://stupid-fast.com/gviz.js"></script>
+    <header>
+    <h1>Player Standings</h1>
+    <h3>Regular season</h3>
+    </header>
+    <table cellpadding="3">
+      <tbody id="tbody">
+        <tr>
+          <td>
+            <center>
+              <code>LOADING...</code>
+            </center>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <small>
+    <br>
+      https://jsfiddle.net/schweissguth/at6v5dub/
+    </small>
+  </center>
+</center>
+
+    <script type="text/javascript">//<![CDATA[
+
+
+var STANDINGS = []
+var PLAYERNAMES = []
+
+
+gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=244048059", "STANDINGS", "SELECT A, B", function(result) {
+result.shift()
+	STANDINGS = result
+  console.log("STANDIGNS", STANDINGS)
+  assignStandings()
+})
+
+
+function assignStandings() {
+	tbody.innerHTML = ""
+	STANDINGS.forEach(function(item, index) {
+  	var tr = tbody.insertRow()
+    tr.insertCell().innerHTML = index + 1
+    tr.insertCell().id = item[0]
+    tr.insertCell().innerHTML = item[1]
+  })
+  getPlayerNames()
+}
+
+
+function getPlayerNames() {
+	gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=244048059", "PLAYERS", "SELECT A, B where C = TRUE", function(result) {
+result.shift()
+	PLAYERS = result
+  console.log("PLAYERS", PLAYERS)
+  assignPlayerNames()
+})
+}
+
+
+function assignPlayerNames() {
+	PLAYERS.forEach(function(item) {
+  	document.getElementById(item[0]).innerHTML = item[1]
+  })
+}
+
+
+  //]]></script>
+
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "at6v5dub"
+      }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
+
+
+</body>
+</html>
