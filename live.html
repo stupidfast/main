@@ -89,12 +89,22 @@ var PLAYERSobj = {}
 var PICKSobj = {}
 
 
-  gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "INFO", "select C", function(result) {
-  //console.log(result)
-  result.shift()
-  PREVRACE = result[0]
+fetch("https://cf.nascar.com/cacher/2023/race_list_basic.json").then(function(x) {
+	return x.json()
+}).then(function(array) {
+	var ARR = array.series_1.reverse()
+  console.log(ARR)
+	var today = new Date(Date.now())
+
+  var find = ARR.find(function(item) {
+  	return new Date(item.date_scheduled) <= today
+  })
+  
+  console.log("current race:", find)
+  PREVRACE = find.race_id
   getResults()
 })
+
 
 function getResults() {
   fetch("https://cf.nascar.com/live/feeds/series_1/" + PREVRACE + "/live_feed.json").then(function(x) {
@@ -170,7 +180,6 @@ function assignPlayers() {
 
 function assignPts() {
 	var trs = document.querySelectorAll("TR")
-  console.log(trs)
   for (var i = 0; i < trs.length; i++) {
   	var td2 = trs[i].insertCell()
   	var td1 = trs[i].getElementsByTagName("TD")[2]
