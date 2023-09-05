@@ -64,10 +64,19 @@
 var PREVRACE = ""
 
 //LIVE scoring RESULTS DATA
-  gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "INFO", "select C", function(result) {
-  console.log(result)
-  result.shift()
-  PREVRACE = result[0]
+fetch("https://cf.nascar.com/cacher/2023/race_list_basic.json").then(function(x) {
+	return x.json()
+}).then(function(array) {
+	var ARR = array.series_1.reverse()
+  console.log(ARR)
+	var today = new Date(Date.now())
+
+  var find = ARR.find(function(item) {
+  	return new Date(item.date_scheduled) <= today
+  })
+  
+  console.log("current race:", find)
+  PREVRACE = find.race_id
   getFlagData()
 })
 
