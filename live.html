@@ -48,6 +48,9 @@ tr td:nth-child(3) {
   font-weight: bold;
 }
 
+input {
+  display: block;
+}
 
     /* EOS */
   </style>
@@ -56,137 +59,180 @@ tr td:nth-child(3) {
 
 </head>
 <body>
-    
-
-<center><center>
-  <table>
-<tbody id="tbody"></tbody>
-  
-</table>
+    <center>
+  <center>
 
 
+    <table>
+      <tbody id="tbody"></tbody>
 
-<script src="https://stupid-fast.com/gviz.js"></script>
+    </table>
+
+
+
     <br>
     <small>https://jsfiddle.net/schweissguth/6y9wroq7/</small>
     <br>
-  <footer>
-    <br><br><br>
-  </footer>
-</center></center>
+    <footer>
+      <details>
+        <summary>Info</summary>
+
+        Date: <input type="date" id="inpdate" onchange="getCurrentRace()">
+        Race date: <input type="text" id="outputraceday" disabled>
+        Race id: <input type="text" id="outputraceid" disabled>
+        Track: <input type="text" id="outputrace" disabled>
+      </details>
+    </footer>
+  </center>
+</center>
 
 
     <script type="text/javascript">//<![CDATA[
 
 
-var PREVRACE = ""
+var SS = "1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU"
+
+var ARR = []
+var RACESCHEDULE = []
+var TODAY = Date.now()
+var RACEID = 0
+var RESULTS = []
 var PICKS = []
 var PLAYERS = []
-var COUNT = 22
-var DRIVERSobj = {}
-var RESULTS = []
-var PLAYERSobj = {}
-var PICKSobj = {}
 
 
-fetch("https://cf.nascar.com/cacher/2023/race_list_basic.json").then(function(x) {
-	return x.json()
-}).then(function(array) {
-	var ARR = array.series_1.reverse()
-  console.log(ARR)
-	var today = new Date(Date.now())
 
-  var find = ARR.find(function(item) {
-  	return new Date(item.date_scheduled) <= today
+function init() {
+  inpdate.valueAsDate = new Date()
+  getRaceSchedule()
+}
+
+init()
+
+function getRaceSchedule() {
+  fetch("https://cf.nascar.com/cacher/2023/race_list_basic.json").then(function(x) {
+    return x.json()
+  }).then(function(item) {
+    RACESCHEDULE = item.series_1.reverse()
+    getCurrentRace()
   })
-  
-  console.log("current race:", find)
-  PREVRACE = find.race_id
+}
+
+function getCurrentRace() {
+	tbody.innerHTML = ""
+  var todaydate = new Date(inpdate.value + "T00:00:00-06:00")
+  var todaytime = todaydate.getTime()
+  console.log(todaytime)
+
+  var race = RACESCHEDULE.find(function(item) {
+    var datestr = new Date(item.date_scheduled).toLocaleDateString()
+    var gettime = new Date(datestr).getTime()
+    console.log(todaytime - gettime)
+    return gettime < todaytime
+  })
+
+  outputraceid.value = race.race_id
+  RACEID = race.race_id
+  outputraceday.value = new Date(race.date_scheduled)
+  outputrace.value = race.track_name
+
   getResults()
-})
+}
 
 
 function getResults() {
-  fetch("https://cf.nascar.com/live/feeds/series_1/" + PREVRACE + "/live_feed.json").then(function(x) {
-    return x.text()
-  }).then(function(y) {
-  	var parse = JSON.parse(y)
-    RESULTS = parse
-  	//console.log("RESULTS", RESULTS)
+  fetch("https://cf.nascar.com/live/feeds/series_1/" + RACEID + "/live_feed.json").then(function(item) {
+    return item.json()
+  }).then(function(item) {
+    RESULTS = item
+    console.log("RESULTS", RESULTS)
     getPicks()
   })
 }
 
+
+
 function getPicks() {
-gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "PICKS", "select A, B, C, D, E, F where B = " + PREVRACE, function(result) {
-  result.shift()
-  PICKS = result
-  //console.log("PICKS", PICKS)
-  getPlayers()
-})
-}
-
-function getPlayers() {
-gviz("1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU", "PLAYERS", "select A, B, C where C = TRUE", function(result) {
-  result.shift()
-  PLAYERS = result
-  //console.log("PLAYERS", PLAYERS)
-  mapPlayers()
-})
-}
-
-
-function mapPlayers() {
-	var obj = {}
-	PLAYERS.forEach(function(item) {
-  	obj[item[0]] = item[1]
+  fetch("https://script.google.com/macros/s/AKfycbxDPpq6qUSoeom_c7U89UEUmZFiMi0WamcpAXgBgoVspm47I3HmwicaiUdpNzGnBlC_jw/exec?ss=" + SS + "&s=PICKS&pw=randy").then(function(item) {
+    return item.json()
+  }).then(function(item) {
+    console.log("PICKS DATARANGE", item)
+    PICKS = item
+    filterPicks()
   })
-  PLAYERSobj = obj
-  //console.log("mapplayers", PLAYERSobj)
+}
+
+function filterPicks() {
+	PICKS = PICKS.filter(function(item) {
+  	return RACEID == item.RACEID
+  })
+  console.log("FILTERED", PICKS)
   mapPicks()
 }
 
+
 function mapPicks() {
-	var obj = {}
 	PICKS.forEach(function(item) {
-  	obj[item[2]] = PLAYERSobj[item[3]]
-  })
-  PICKSobj = obj
-  //console.log("mappicks", PICKSobj)
-  makeTable()
-}
-
-
-function makeTable() {
-	RESULTS.vehicles.forEach(function(item, index) {
-    	var tr = tbody.insertRow()
-      tr.insertCell().innerHTML = index + 1
-      tr.insertCell().innerHTML = item.driver.full_name
-      tr.insertCell().id = "c" + item.vehicle_number
+  	var split = item.DRIVERID.split("c")[1]
+  	var find = RESULTS.vehicles.find(function(jtem) {
+    	return jtem.vehicle_number == parseInt(split)
     })
-    assignPlayers()
+    if (find) {
+    	find.data_playerid = item.PLAYERID
+      console.log()
+    }
+  })
+  console.log("VEHICLES", RESULTS.vehicles)
+  getPlayers()
+}
+
+
+function getPlayers() {
+  fetch("https://script.google.com/macros/s/AKfycbxDPpq6qUSoeom_c7U89UEUmZFiMi0WamcpAXgBgoVspm47I3HmwicaiUdpNzGnBlC_jw/exec?ss=" + SS + "&s=PLAYERS&pw=randy").then(function(item) {
+    return item.json()
+  }).then(function(item) {
+    PLAYERS = item.filter(function(jtem) {
+    	return jtem.ACTIVE == "TRUE"
+    })
+    console.log("PLAYERS DATARANGE", PLAYERS)
+    mapPlayers()
+  })
+}
+
+function mapPlayers() {
+	console.log("mapping players")
+	PLAYERS.forEach(function(item) {
+  	RESULTS.vehicles.map(function(jtem) {
+    	if (jtem.data_playerid == item.PLAYERID) {
+      	jtem.data_playername = item.PLAYERNAME
+      }
+    })
+
+  })
+  console.log("VEHICLES", RESULTS.vehicles)
+  buildTable()
+
 }
 
 
 
-function assignPlayers() {
-	var trs = document.getElementsByTagName("TR")
-	for (var i in PICKSobj) {
-  	document.getElementById(i).innerHTML = PICKSobj[i] || ""
-  }
-  assignPts()
-}
-
-
-function assignPts() {
-	var trs = document.querySelectorAll("TR")
-  for (var i = 0; i < trs.length; i++) {
-  	var td2 = trs[i].insertCell()
-  	var td1 = trs[i].getElementsByTagName("TD")[2]
-  if (td1.innerText) {
-  	td2.innerText = COUNT--
-  }
-  }
+function buildTable() {
+	tbody.innerHTML = ""
+  	var count = 22
+	RESULTS.vehicles.forEach(function(item, index) {
+    var tr = tbody.insertRow()
+    tr.insertCell().innerHTML = item.running_position
+    tr.insertCell().innerHTML = item.driver.full_name
+    tr.insertCell().innerHTML = item.data_playername || ""
+    if (item.data_playerid) {
+      tr.insertCell().innerHTML = count--
+    
+    } else {
+    
+    tr.insertCell().innerHTML = ""
+    }
+    
+  })
 }
 
 
