@@ -107,6 +107,18 @@ function init() {
   getRaceSchedule()
 }
 
+
+function combineArrays(a, b, ka, kb, kr) {
+	a.forEach(function(item) {
+    	item[kr] = null
+  	b.forEach(function(jtem) {
+    	if (item[ka] == jtem[kb]) {
+      	item[kr] = jtem[kr]
+      }
+    })
+  })
+}
+
 init()
 
 function getRaceSchedule() {
@@ -122,12 +134,10 @@ function getCurrentRace() {
 	tbody.innerHTML = ""
   var todaydate = new Date(inpdate.value + "T00:00:00-06:00")
   var todaytime = todaydate.getTime()
-  console.log(todaytime)
 
   var race = RACESCHEDULE.find(function(item) {
     var datestr = new Date(item.date_scheduled).toLocaleDateString()
     var gettime = new Date(datestr).getTime()
-    console.log(todaytime - gettime)
     return gettime < todaytime
   })
 
@@ -145,7 +155,6 @@ function getResults() {
     return item.json()
   }).then(function(item) {
     RESULTS = item
-    console.log("RESULTS", RESULTS)
     getPicks()
   })
 }
@@ -156,7 +165,6 @@ function getPicks() {
   fetch("https://script.google.com/macros/s/AKfycbxDPpq6qUSoeom_c7U89UEUmZFiMi0WamcpAXgBgoVspm47I3HmwicaiUdpNzGnBlC_jw/exec?ss=" + SS + "&s=PICKS&pw=randy").then(function(item) {
     return item.json()
   }).then(function(item) {
-    console.log("PICKS DATARANGE", item)
     PICKS = item
     filterPicks()
   })
@@ -166,23 +174,10 @@ function filterPicks() {
 	PICKS = PICKS.filter(function(item) {
   	return RACEID == item.RACEID
   })
-  console.log("FILTERED", PICKS)
-  mapPicks()
-}
-
-
-function mapPicks() {
-	PICKS.forEach(function(item) {
-  	var split = item.DRIVERID.split("c")[1]
-  	var find = RESULTS.vehicles.find(function(jtem) {
-    	return jtem.vehicle_number == parseInt(split)
-    })
-    if (find) {
-    	find.data_playerid = item.PLAYERID
-      console.log()
-    }
+  PICKS.map(function(item) {
+  	item.DRIVERID = item.DRIVERID.split("c")[1]
   })
-  console.log("VEHICLES", RESULTS.vehicles)
+  combineArrays(RESULTS.vehicles, PICKS, "vehicle_number", "DRIVERID", "PLAYERID")
   getPlayers()
 }
 
@@ -194,24 +189,10 @@ function getPlayers() {
     PLAYERS = item.filter(function(jtem) {
     	return jtem.ACTIVE == "TRUE"
     })
-    console.log("PLAYERS DATARANGE", PLAYERS)
-    mapPlayers()
+    combineArrays(RESULTS.vehicles, PLAYERS, "PLAYERID", "PLAYERID", "PLAYERNAME")
+    console.log(RESULTS.vehicles)
+    buildTable()
   })
-}
-
-function mapPlayers() {
-	console.log("mapping players")
-	PLAYERS.forEach(function(item) {
-  	RESULTS.vehicles.map(function(jtem) {
-    	if (jtem.data_playerid == item.PLAYERID) {
-      	jtem.data_playername = item.PLAYERNAME
-      }
-    })
-
-  })
-  console.log("VEHICLES", RESULTS.vehicles)
-  buildTable()
-
 }
 
 
@@ -223,8 +204,8 @@ function buildTable() {
     var tr = tbody.insertRow()
     tr.insertCell().innerHTML = item.running_position
     tr.insertCell().innerHTML = item.driver.full_name
-    tr.insertCell().innerHTML = item.data_playername || ""
-    if (item.data_playerid) {
+    tr.insertCell().innerHTML = item.PLAYERNAME || ""
+    if (item.PLAYERID) {
       tr.insertCell().innerHTML = count--
     
     } else {
