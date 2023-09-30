@@ -109,13 +109,15 @@ function init() {
 
 
 function combineArrays(a, b, ka, kb, kr) {
-	a.forEach(function(item) {
-    	item[kr] = null
-  	b.forEach(function(jtem) {
-    	if (item[ka] == jtem[kb]) {
-      	item[kr] = jtem[kr]
-      }
+  a.map(function(item) {
+    item[kr] = null
+    var FIND = b.find(function(jtem) {
+      return jtem[kb] == item[ka]
     })
+    if (FIND) {
+      item[kr] = FIND[kr]
+    }
+
   })
 }
 
@@ -131,9 +133,9 @@ function getRaceSchedule() {
 }
 
 function getCurrentRace() {
-	tbody.innerHTML = ""
+  tbody.innerHTML = ""
   var todaydate = new Date(inpdate.value + "T00:00:00-06:00")
-  var todaytime = todaydate.getTime()
+  var todaytime = parseInt(todaydate.getTime())
 
   var race = RACESCHEDULE.find(function(item) {
     var datestr = new Date(item.date_scheduled).toLocaleDateString()
@@ -165,17 +167,17 @@ function getPicks() {
   fetch("https://script.google.com/macros/s/AKfycbxDPpq6qUSoeom_c7U89UEUmZFiMi0WamcpAXgBgoVspm47I3HmwicaiUdpNzGnBlC_jw/exec?ss=" + SS + "&s=PICKS&pw=randy").then(function(item) {
     return item.json()
   }).then(function(item) {
-    PICKS = item
+    PICKS = item.reverse()
     filterPicks()
   })
 }
 
 function filterPicks() {
-	PICKS = PICKS.filter(function(item) {
-  	return RACEID == item.RACEID
+  PICKS = PICKS.filter(function(item) {
+    return RACEID == item.RACEID
   })
   PICKS.map(function(item) {
-  	item.DRIVERID = item.DRIVERID.split("c")[1]
+    item.DRIVERID = item.DRIVERID.split("c")[1]
   })
   combineArrays(RESULTS.vehicles, PICKS, "vehicle_number", "DRIVERID", "PLAYERID")
   getPlayers()
@@ -187,7 +189,7 @@ function getPlayers() {
     return item.json()
   }).then(function(item) {
     PLAYERS = item.filter(function(jtem) {
-    	return jtem.ACTIVE == "TRUE"
+      return jtem.ACTIVE == "TRUE"
     })
     combineArrays(RESULTS.vehicles, PLAYERS, "PLAYERID", "PLAYERID", "PLAYERNAME")
     console.log(RESULTS.vehicles)
@@ -198,23 +200,24 @@ function getPlayers() {
 
 
 function buildTable() {
-	tbody.innerHTML = ""
-  	var count = 22
-	RESULTS.vehicles.forEach(function(item, index) {
+  tbody.innerHTML = ""
+  var count = 22
+  RESULTS.vehicles.forEach(function(item, index) {
     var tr = tbody.insertRow()
     tr.insertCell().innerHTML = item.running_position
     tr.insertCell().innerHTML = item.driver.full_name
     tr.insertCell().innerHTML = item.PLAYERNAME || ""
     if (item.PLAYERID) {
       tr.insertCell().innerHTML = count--
-    
+
     } else {
-    
-    tr.insertCell().innerHTML = ""
+
+      tr.insertCell().innerHTML = ""
     }
-    
+
   })
 }
+
 
 
   //]]></script>
