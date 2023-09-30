@@ -45,6 +45,14 @@
   <script src="https://stupid-fast.com/gviz.js"></script>
   <footer>
   <br>
+      <details>
+        <summary>Info</summary>
+
+        Date: <input type="date" id="inpdate" onchange="getCurrentRace()">
+        Race date: <input type="text" id="outputraceday" disabled>
+        Race id: <input type="text" id="outputraceid" disabled>
+        Track: <input type="text" id="outputrace" disabled>
+      </details>
     <small>
       https://jsfiddle.net/schweissguth/vzkm5ra2/
     </small>
@@ -61,29 +69,54 @@
     <script type="text/javascript">//<![CDATA[
 
 
-var PREVRACE = ""
+var SS = "1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU"
+var TODAY = Date.now()
+var RACEID = 0
 
-//LIVE scoring RESULTS DATA
-fetch("https://cf.nascar.com/cacher/2023/race_list_basic.json").then(function(x) {
-	return x.json()
-}).then(function(array) {
-	var ARR = array.series_1.reverse()
-  console.log(ARR)
-	var today = new Date(Date.now())
 
-  var find = ARR.find(function(item) {
-  	return new Date(item.date_scheduled) <= today
+
+
+function init() {
+  inpdate.valueAsDate = new Date()
+  getRaceSchedule()
+}
+
+init()
+
+function getRaceSchedule() {
+  fetch("https://cf.nascar.com/cacher/2023/race_list_basic.json").then(function(x) {
+    return x.json()
+  }).then(function(item) {
+    RACESCHEDULE = item.series_1.reverse()
+    getCurrentRace()
   })
-  
-  console.log("current race:", find)
-  PREVRACE = find.race_id
-  getFlagData()
-})
+}
+
+function getCurrentRace() {
+	laps.innerHTML = ""
+  var todaydate = new Date(inpdate.value + "T00:00:00-06:00")
+  var todaytime = todaydate.getTime()
+  console.log(todaytime)
+
+  var race = RACESCHEDULE.find(function(item) {
+    var datestr = new Date(item.date_scheduled).toLocaleDateString()
+    var gettime = new Date(datestr).getTime()
+    console.log(todaytime - gettime)
+    return gettime < todaytime
+  })
+
+  outputraceid.value = race.race_id
+  RACEID = race.race_id
+  outputraceday.value = new Date(race.date_scheduled)
+  outputrace.value = race.track_name
+
+  getRaceFeed()
+}
 
 
 
-function getFlagData() {
-  fetch("https://cf.nascar.com/cacher/2023/1/" + PREVRACE + "/lap-notes.json").then(function(x) {
+function getRaceFeed() {
+  fetch("https://cf.nascar.com/cacher/2023/1/" + RACEID + "/lap-notes.json").then(function(x) {
     return x.text();
   }).then(function(y) {
     var arr = JSON.parse(y)
