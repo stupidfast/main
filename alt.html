@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="demo">LOADING...</div>
+
+<script>
+let file = "https://script.google.com/macros/s/AKfycbx-lUgY2E9okoBO7HLUl7fVNB71jOuqPiZYdjKmXShyqVgPyAE-45VgA9IrMxUsJc0/exec"
+fetch (file)
+.then(x => x.text())
+.then(function(item) {
+console.log(item)
+demo.innerHTML = item
+
+})
+
+
+</script>
+
+</body>
+</html>
