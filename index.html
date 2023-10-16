@@ -31,6 +31,18 @@ a {
   font-size: 1.2em;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+  background: whitesmoke;
+}
+
+th, td {
+  padding: 3px;
+}
+
     /* EOS */
   </style>
 
@@ -56,15 +68,20 @@ a {
   
 
 
-<br>
 
-<script async src="//jsfiddle.net/schweissguth/tq0enxbw/embed/result/"></script>
-  
-  
-  <script async src="//jsfiddle.net/schweissguth/6y9wroq7/embed/result/"></script>
+<center>
+  <center>
+    <table>
+
+  <tbody id="tplayers"></tbody>
+
+</table>
+
+  </center>
+</center>
 
 
-
+<iframe width="100%" height="2000" src="//jsfiddle.net/schweissguth/6y9wroq7/embedded/result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
   </center></center>
 
@@ -106,6 +123,195 @@ function getHomepage() {
 }
 
 getHomepage()
+
+
+
+
+
+var CURRENTRACE = ""
+var PICKS = []
+var PLAYERS = []
+var PICKORDER = []
+var DRIVERS = []
+var INFO = []
+
+
+
+
+function getPlayers() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/PLAYERS?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    PLAYERS = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+    //console.log("PLAYERS", PLAYERS)
+
+    PLAYERS = PLAYERS.filter(function(item) {
+      return item.ACTIVE == "TRUE"
+    })
+
+    PLAYERS.forEach(function(item) {
+      var tr = tplayers.insertRow()
+      tr.id = item.PLAYERID
+      //tr.insertCell().innerHTML = item.PLAYERID
+    })
+
+    getPickOrder()
+
+
+  })
+}
+
+getPlayers()
+
+
+
+
+function getPickOrder() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/PICKORDER?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    PICKORDER = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+    //console.log("PICKORDER", PICKORDER)
+
+    PLAYERS.map(function(item, index) {
+      var find = PICKORDER.find(function(jtem) {
+        return jtem.PLAYERID == item.PLAYERID
+      }) || {
+        BLEND: null,
+        ["SUM of TOTAL"]: null
+      }
+      item.BLEND = find.BLEND
+      item.TOTAL = find["SUM of TOTAL"]
+    })
+
+    getCurrentRace()
+
+
+
+  })
+
+}
+
+
+function getCurrentRace() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/INFO?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    INFO = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })[0]
+
+    //console.log("INFO", INFO)
+
+    getPicks()
+
+  })
+
+}
+
+
+function getPicks() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/PICKS?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    PICKS = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+
+    PICKS = PICKS.filter(function(item) {
+      return item.RACEID == INFO.CURRENTRACE
+    }).reverse()
+
+    //console.log("PICKS", PICKS)
+
+    getDrivers()
+
+  })
+
+}
+
+
+function getDrivers() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/DRIVERS?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    DRIVERS = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+
+    DRIVERS.map(function(item) {
+      var find = PICKS.find(function(jtem) {
+        return jtem.DRIVERID == item.DRIVERID
+      }) || {
+        PLAYERID: null
+      }
+
+      item.PLAYERID = find.PLAYERID
+    })
+
+    //console.log("DRIVERS", DRIVERS)
+
+    PLAYERS.map(function(item) {
+      var filter = DRIVERS.filter(function(jtem) {
+        return jtem.PLAYERID == item.PLAYERID
+      }) || []
+
+      item.PICKS = filter
+    })
+
+    buildTable()
+
+
+
+  })
+
+}
+
+
+
+
+function buildTable() {
+  PLAYERS = PLAYERS.sort(function(a, b) {
+    return a.BLEND - b.BLEND
+  })
+
+  PLAYERS.forEach(function(item) {
+    var tr = tplayers.insertRow()
+    tr.insertCell().innerHTML = item.PLAYERNAME +
+      " <small>(" + item.TOTAL + ")</small>"
+    var td = tr.insertCell()
+    var t = document.createElement("TABLE")
+    item.PICKS.forEach(function(jtem) {
+      t.insertRow().innerHTML = jtem.DRIVERNAME
+    })
+    td.append(t)
+  })
+}
+
 
 
 
