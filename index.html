@@ -20,9 +20,7 @@
 
 
   <style id="compiled-css" type="text/css">
-    
-
-a {
+    a {
   margin: 15px;
 }
 
@@ -39,9 +37,11 @@ tr:nth-child(even) {
   background: whitesmoke;
 }
 
-th, td {
+th,
+td {
   padding: 3px;
 }
+
 
     /* EOS */
   </style>
@@ -50,40 +50,43 @@ th, td {
 
 </head>
 <body>
-    <center><center>
+    <center>
+  <center>
     <br>
 
-  
-  <a href="https://www.stupid-fast.com" class="banner">
-    <img src="https://www.stupid-fast.com/banner.png">
-  </a>
- <br>
 
- 
-<center id="links" style="display: inline-block;">
-
-  </center>
-  <br>
-  <br>
-  
+    <a href="https://www.stupid-fast.com" class="banner">
+      <img src="https://www.stupid-fast.com/banner.png">
+    </a>
+    <br>
 
 
+    <center id="links" style="display: inline-block;">
 
-<center>
-  <center>
-    <table>
+    </center>
+    <br>
+    <br>
 
-  <tbody id="tplayers"></tbody>
 
-</table>
+
+
+    <center>
+      <center>
+        <table>
+
+          <tbody id="tplayers"></tbody>
+
+        </table>
+
+      </center>
+    </center>
+
+
+    <iframe width="290" height="2000" src="https://stupid-fast.com/live.html" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
 
   </center>
 </center>
 
-
-<iframe width="290" height="2000" src="//jsfiddle.net/schweissguth/6y9wroq7/embedded/result/" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
-
-  </center></center>
 
     <script type="text/javascript">//<![CDATA[
 
@@ -91,8 +94,8 @@ th, td {
 var HOMEPAGE = []
 
 function getHomepage() {
-	fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/HOMEPAGE?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
-  	return item.json()
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/HOMEPAGE?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
   }).then(function(item) {
     var header = item.values.shift()
     HOMEPAGE = item.values.map(function(jtem) {
@@ -101,14 +104,14 @@ function getHomepage() {
         return total
       }, {})
     })
-  	console.log("HOMEPAGE", HOMEPAGE)
-    
+    console.log("HOMEPAGE", HOMEPAGE)
+
     HOMEPAGE = HOMEPAGE.filter(function(jtem) {
-    	return jtem.ACTIVE == "TRUE"
+      return jtem.ACTIVE == "TRUE"
     })
-    
+
     HOMEPAGE.forEach(function(jtem) {
-    	var tag = document.createElement(jtem.TAG)
+      var tag = document.createElement(jtem.TAG)
       tag.href = jtem.HREF
       tag.innerHTML = jtem.TEXT
       tag.target = jtem.TARGET
@@ -134,6 +137,7 @@ var PLAYERS = []
 var PICKORDER = []
 var DRIVERS = []
 var INFO = []
+var LIVE = []
 
 
 
@@ -313,6 +317,26 @@ function buildTable() {
 }
 
 
+function getLiveHTML() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/INFO?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    LIVE = result.values
+    console.log("LIVE", LIVE)
+
+    LIVE.forEach(function(item) {
+      divlive.innerHTML += item[3]
+    })
+
+    //console.log("PICKS", PICKS)
+
+
+  })
+}
+
+
+getLiveHTML()
 
 
 
