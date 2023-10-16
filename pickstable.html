@@ -20,50 +20,43 @@
 
 
   <style id="compiled-css" type="text/css">
-    * {
-  //outline: 1px solid;
+    body,
+html {
+  //font-family: Tahoma, sans-serif;
+  //font-size: 0.95em;
 }
 
-html, body {
-  margin: 0px;
-  padding: 0px;
-}
-
-center center {
-  font-family: sans-serif;
-  font-size: 0.8em;
-}
-
-table, td {
-  //border: 1px solid;
+table {
   border-collapse: collapse;
-	padding: 3px 0px 3px 3px;
-  white-space: nowrap;
-  overflow: hidden;
+  border: 0px solid;
 }
 
-#table {
-  table-layout: fixed;
-  width: 100%;
-  max-width: 290px;
+td,
+th {
+  border: 0px solid;
+  border-spacing: 10px 10px;
+  padding: 0px 3px 0px 3px;
 }
 
-#table > tbody > tr > td:first-child span {
-  font-weight: bold;
+#tplayers>tr:nth-child(even) {
+  background: whitesmoke;
 }
 
-table > tbody > tr > td:first-child {
-  width: 85px;
+h3 {
+  margin-top: 40px;
 }
 
-table table {
-  table-layout: fixed;
-  width: 100%;  
+
+
+th {
+  text-align: left;
 }
 
-table tr:nth-child(even) tr, table tr:nth-child(even) {
-  background-color: #AFA;
+
+h4 {
+  margin-top: 40px;
 }
+
 
     /* EOS */
   </style>
@@ -72,32 +65,14 @@ table tr:nth-child(even) tr, table tr:nth-child(even) {
 
 </head>
 <body>
-    <center>
-  <center>
-    
-<table id="table">
+    <table>
 
-  <tbody id="tbody"></tbody>
+  <tbody id="tplayers"></tbody>
 
 </table>
 
 
-
-
-
-<script src="https://stupid-fast.com/gviz.js"></script>
-
-<br>
-  <small>https://jsfiddle.net/schweissguth/tq0enxbw/</small>
-<footer>
-</footer>
-  </center>
-</center>
-
-
-
     <script type="text/javascript">//<![CDATA[
-
 
 
 var CURRENTRACE = ""
@@ -105,102 +80,184 @@ var PICKS = []
 var PLAYERS = []
 var PICKORDER = []
 var DRIVERS = []
-
-gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=2062292820", "INFO", "", function(result) {
-  result.shift()
-	//console.log(result)
-  CURRENTRACE = result[0][0]
-  //console.log("CURRENET RACE", CURRENTRACE)
-  getDrivers()
-  
-})
-
-
-
-function getDrivers() {
-gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=2062292820", "DRIVERS", "SELECT * ", function(result) {
-	result.shift()
-	//console.log("DRIVERS", result)
-  DRIVERS = result
-  getPicks()
-})
-
-}
-
-
-
-function getPicks() {
-gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=2062292820", "PICKS", "SELECT A, B, C, D, E where (B = " + CURRENTRACE + ")" , function(result) {
-	result.shift()
-	//console.log("PICKS", result)
-  PICKS = result
-  getPickOrder()
-})
-
-}
-
-function getPickOrder() {
-gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=2062292820", "PICKORDER", "SELECT A, B order by D" , function(result) {
-	result.shift()
-	//console.log(result)
-  PICKORDER = result
-  makeTable()
-})
-
-}
-
-
-
-function makeTable() {
-	PICKORDER.forEach(function(item) {
-  	var tr = tbody.insertRow()
-    tr.id = item[0]
-    tr.insertCell().innerHTML = "<span class='playername'></span>" + "<small> (" + parseInt(item[1]) + ")</small>"
-    tr.insertCell().innerHTML = "<table><tr class='picks'></tr></table>"
-  })
-  getPlayers()
-}
+var INFO = []
 
 
 
 
 function getPlayers() {
-gviz("https://docs.google.com/spreadsheets/d/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/edit#gid=2062292820", "PLAYERS", "SELECT * where C = " + "TRUE" + "" , function(result) {
-	result.shift()
-	//console.log(result)
-  PLAYERS = result
-  assignPlayerNames()
-})
-
-}
-
-function assignPlayerNames() {
-	PLAYERS.forEach(function(item) {
-  	var tr = document.getElementById(item[0])
-    tr.getElementsByClassName("playername")[0].innerHTML = item[1]
-  })
-  assignDrivers()
-}
-
-
-function assignDrivers() {
-	PICKS.reverse()
-	DRIVERS.forEach(function(item) {
-  	var find = PICKS.find(function(jtem) {
-    	return jtem[2] == item[0]
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/PLAYERS?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    PLAYERS = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
     })
-    try {
-  	var tr = document.getElementById(find[3])
-    var innertr = tr.getElementsByClassName("picks")[0]
-    innertr.innerHTML += "<td>" + item[1] + "</td>"
-    
-    } catch(err) {}
-    
-    
+    console.log("PLAYERS", PLAYERS)
+
+    PLAYERS = PLAYERS.filter(function(item) {
+      return item.ACTIVE == "TRUE"
+    })
+
+    PLAYERS.forEach(function(item) {
+      var tr = tplayers.insertRow()
+      tr.id = item.PLAYERID
+      //tr.insertCell().innerHTML = item.PLAYERID
+    })
+
+    getPickOrder()
+
+
   })
 }
 
+getPlayers()
 
+
+
+
+function getPickOrder() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/PICKORDER?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    PICKORDER = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+    console.log("PICKORDER", PICKORDER)
+
+    PLAYERS.map(function(item, index) {
+      var find = PICKORDER.find(function(jtem) {
+        return jtem.PLAYERID == item.PLAYERID
+      }) || {
+        BLEND: null,
+        ["SUM of TOTAL"]: null
+      }
+      item.BLEND = find.BLEND
+      item.TOTAL = find["SUM of TOTAL"]
+    })
+
+    getCurrentRace()
+
+
+
+  })
+
+}
+
+
+function getCurrentRace() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/INFO?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    INFO = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })[0]
+
+    console.log("INFO", INFO)
+
+    getPicks()
+
+  })
+
+}
+
+
+function getPicks() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/PICKS?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    PICKS = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+
+    PICKS = PICKS.filter(function(item) {
+      return item.RACEID == INFO.CURRENTRACE
+    }).reverse()
+
+    console.log("PICKS", PICKS)
+
+    getDrivers()
+
+  })
+
+}
+
+
+function getDrivers() {
+  fetch("https://sheets.googleapis.com/v4/spreadsheets/1jwadkJYYfBmf-SbjUokDV0S_yzC7gD39-jHxVatJfLU/values/DRIVERS?alt=json&key=AIzaSyDhLaELifRHh1xemqXD92dXajIdevmltSQ").then(function(item) {
+    return item.json()
+  }).then(function(result) {
+    var header = result.values.shift()
+    DRIVERS = result.values.map(function(item) {
+      return item.reduce(function(total, jtem, j) {
+        total[header[j]] = jtem
+        return total
+      }, {})
+    })
+
+    DRIVERS.map(function(item) {
+      var find = PICKS.find(function(jtem) {
+        return jtem.DRIVERID == item.DRIVERID
+      }) || {
+        PLAYERID: null
+      }
+
+      item.PLAYERID = find.PLAYERID
+    })
+
+    console.log("DRIVERS", DRIVERS)
+
+    PLAYERS.map(function(item) {
+      var filter = DRIVERS.filter(function(jtem) {
+        return jtem.PLAYERID == item.PLAYERID
+      }) || []
+
+      item.PICKS = filter
+    })
+
+    buildTable()
+
+
+
+  })
+
+}
+
+
+
+
+function buildTable() {
+  PLAYERS = PLAYERS.sort(function(a, b) {
+    return a.BLEND - b.BLEND
+  })
+
+  PLAYERS.forEach(function(item) {
+    var tr = tplayers.insertRow()
+    tr.insertCell().innerHTML = item.PLAYERNAME +
+      " <small>(" + item.TOTAL + ")</small>"
+    var td = tr.insertCell()
+    var t = document.createElement("TABLE")
+    item.PICKS.forEach(function(jtem) {
+      t.insertRow().innerHTML = jtem.DRIVERNAME
+    })
+    td.append(t)
+  })
+}
 
 
 
