@@ -96,7 +96,7 @@ function getPlayers() {
         return total
       }, {})
     })
-    console.log("PLAYERS", PLAYERS)
+    //console.log("PLAYERS", PLAYERS)
 
     PLAYERS = PLAYERS.filter(function(item) {
       return item.ACTIVE == "TRUE"
@@ -130,7 +130,7 @@ function getPickOrder() {
         return total
       }, {})
     })
-    console.log("PICKORDER", PICKORDER)
+    //console.log("PICKORDER", PICKORDER)
 
     PLAYERS.map(function(item, index) {
       var find = PICKORDER.find(function(jtem) {
@@ -164,7 +164,7 @@ function getCurrentRace() {
       }, {})
     })[0]
 
-    console.log("INFO", INFO)
+    //console.log("INFO", INFO)
 
     getPicks()
 
@@ -189,7 +189,7 @@ function getPicks() {
       return item.RACEID == INFO.CURRENTRACE
     }).reverse()
 
-    console.log("PICKS", PICKS)
+    //console.log("PICKS", PICKS)
 
     getDrivers()
 
@@ -220,7 +220,7 @@ function getDrivers() {
       item.PLAYERID = find.PLAYERID
     })
 
-    console.log("DRIVERS", DRIVERS)
+    //console.log("DRIVERS", DRIVERS)
 
     PLAYERS.map(function(item) {
       var filter = DRIVERS.filter(function(jtem) {
