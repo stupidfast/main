@@ -109,7 +109,7 @@ function getHomepage() {
     
     HOMEPAGE.forEach(function(jtem) {
     	var tag = document.createElement(jtem.TAG)
-      tag.href = item.HREF
+      tag.href = jtem.HREF
       tag.innerHTML = jtem.TEXT
       tag.target = jtem.TARGET
       tag.style = jtem.STYLE
