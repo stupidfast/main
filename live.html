@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title></title>
+  <title>LIVE RACE - Stupid-Fast</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="robots" content="noindex, nofollow">
   <meta name="googlebot" content="noindex, nofollow">
@@ -71,15 +71,6 @@ h4 {
 
 <h4>Running order:</h4>
 <table>
-<thead>
-  <tr>
-    <th>Pos</th>
-    <th>Driver</th>
-    <th>Delta</th>
-    <th>Player</th>
-    <th>Pts</th>
-  </tr>
-</thead>
 <tbody id="tcurrentrace"></tbody>
 </table>
 
@@ -155,8 +146,8 @@ function getCurrentRace() {
       var tr = tcurrentrace.insertRow()
       tr.id = "c" + jtem.vehicle_number
       tr.insertCell().innerHTML = jtem.running_position
-      tr.insertCell().innerHTML = jtem.driver.full_name
-      tr.insertCell().innerHTML = "<small>" + Math.round(-jtem.delta * 10) / 10 + "</small>"
+      tr.insertCell().innerHTML = jtem.driver.full_name.split("(")[0] + " <small>" + Math.round(-jtem.delta * 10) / 10 + "</small>"
+      //tr.insertCell().innerHTML =
     })
 
     getStages()
@@ -318,7 +309,7 @@ function getPlayers() {
 
       var td = document.getElementsByClassName(jtem.PLAYERID)
       for (var i of td) {
-        i.innerHTML = jtem.PLAYERNAME
+        i.innerHTML = "<i>" + jtem.PLAYERNAME + "</i>"
       }
     })
     
