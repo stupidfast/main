@@ -29,8 +29,9 @@
 
 </head>
 <body>
-    
-<center>
+    <center>
+
+<center style="width: 100%; max-width: 290px;">
 <div id="divraceinfo"></div>
     <br>
 
@@ -94,7 +95,7 @@
     </table>
     
     </center>
-
+</center>
 
     <script type="text/javascript">//<![CDATA[
 
@@ -325,9 +326,9 @@ function mapPts() {
 function getHeight() {
 	var ht = window.document.body.clientHeight
   console.log(ht)
-  window.parent.postMessage(["randy", ht], "*")
-  window.parent.parent.postMessage(["randy", ht], "*")
-  window.parent.parent.parent.postMessage(["randy", ht], "*")
+  window.parent.postMessage("randy", ht)
+  window.parent.parent.postMessage("randy", ht)
+  window.parent.parent.parent.postMessage("randy", ht)
 }
 
 
