@@ -36,7 +36,7 @@ table {
 }
 
 tr:nth-child(even) {
-  background: whitesmoke;
+  background: #FFC;
 }
 
 th, td {
@@ -61,97 +61,84 @@ th, td {
     <br>
 
 
-    <center id="links" style="display: inline-block;">
-
-    </center>
+    <div id="links" style="display: inline-block;">
+    </div>
     <br>
     <br>
 
 
 
-<center style="max-width: 290px;">
-    <center style="max-width: 290px;">
-      <table>
-
-        <tbody id="tplayers"></tbody>
-
-      </table>
-
-    </center>
+    <table>
+      <tbody id="tplayers" style="width: 290px"></tbody>
+    </table>
 
 
-
-    <center>
-
-      <h4>Current race:</h4>
-      <table>
-        <tbody id="traceinfo">
-
-        </tbody>
-      </table>
-
-      <h4>Running order:</h4>
-      <table>
-        <tbody id="tcurrentrace"></tbody>
-      </table>
-
-      <h4>Live race feed: </h4>
-      <table>
-        <thead>
-          <tr>
-            <th>Lap</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody id="tracefeed"></tbody>
-      </table>
+    <br><br>
 
 
+    <div id="divraceinfo"></div>
+    <br>
 
+    <table>
+      <tbody id="tcurrentrace"></tbody>
+    </table>
 
-      <h4>Stage results:</h4>
-      <table>
-        <thead>
-          <tr id="shead">
-            <th>Pos</th>
-          </tr>
-
-        </thead>
-        <tbody id="tstages"></tbody>
-        <tr id="sp0">
-          <td>1</td>
+    <h4>Live race feed: </h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Lap</th>
+          <th>Notes</th>
         </tr>
-        <tr id="sp1">
-          <td>2</td>
-        </tr>
-        <tr id="sp2">
-          <td>3</td>
-        </tr>
-        <tr id="sp3">
-          <td>4</td>
-        </tr>
-        <tr id="sp4">
-          <td>5</td>
-        </tr>
-        <tr id="sp5">
-          <td>6</td>
-        </tr>
-        <tr id="sp6">
-          <td>7</td>
-        </tr>
-        <tr id="sp7">
-          <td>8</td>
-        </tr>
-        <tr id="sp8">
-          <td>9</td>
-        </tr>
-        <tr id="sp9">
-          <td>10</td>
-        </tr>
-      </table>
+      </thead>
+      <tbody id="tracefeed"></tbody>
+    </table>
 
-    </center>
-    </center>
+
+
+
+    <h4>Stage results:</h4>
+    <table>
+      <thead>
+        <tr id="shead">
+          <th>Pos</th>
+        </tr>
+
+      </thead>
+      <tbody id="tstages"></tbody>
+      <tr id="sp0">
+        <td>1</td>
+      </tr>
+      <tr id="sp1">
+        <td>2</td>
+      </tr>
+      <tr id="sp2">
+        <td>3</td>
+      </tr>
+      <tr id="sp3">
+        <td>4</td>
+      </tr>
+      <tr id="sp4">
+        <td>5</td>
+      </tr>
+      <tr id="sp5">
+        <td>6</td>
+      </tr>
+      <tr id="sp6">
+        <td>7</td>
+      </tr>
+      <tr id="sp7">
+        <td>8</td>
+      </tr>
+      <tr id="sp8">
+        <td>9</td>
+      </tr>
+      <tr id="sp9">
+        <td>10</td>
+      </tr>
+    </table>
+
+
   </center>
 
 </center>
@@ -173,7 +160,7 @@ function getHomepage() {
         return total
       }, {})
     })
-  	console.log("HOMEPAGE", HOMEPAGE)
+  	//console.log("HOMEPAGE", HOMEPAGE)
     
     HOMEPAGE = HOMEPAGE.filter(function(jtem) {
     	return jtem.ACTIVE == "TRUE"
@@ -187,7 +174,6 @@ function getHomepage() {
       tag.style = jtem.STYLE
       tag.id = jtem.id
       tag.className = jtem.CLASS
-      console.log(tag)
       links.append(tag)
 
     })
@@ -406,17 +392,16 @@ function getLiveRace() {
     return item.json()
   }).then(function(item) {
     CURRENTRACE = item
-    //console.log("CURRENTRACE", CURRENTRACE)
+    console.log("CURRENTRACE", CURRENTRACE)
     CURRENTRACEID = CURRENTRACE.race_id
     //console.log("CURRENTRACEID", CURRENTRACEID)
 
-    traceinfo.innerHTML = "<tr><td>Track</td><td>" + CURRENTRACE.track_name + "</td></tr>"
-    traceinfo.innerHTML += "<tr><td>Flag status</td><td>" + FLAG + "</td></tr>"
-    traceinfo.innerHTML += "<tr><td>Stage</td><td>" + CURRENTRACE.stage.stage_num + "</td></tr>"
-    traceinfo.innerHTML += "<tr><td>Lap</td><td>Lap " +
-      CURRENTRACE.lap_number + " / " +
-      CURRENTRACE.laps_in_race + " (" +
-      CURRENTRACE.laps_to_go + " laps to go)</td></tr>"
+    divraceinfo.innerHTML += "<h3>" + CURRENTRACE.track_name + "</h3>"
+    divraceinfo.innerHTML += CURRENTRACE.lap_number + " / " +
+      CURRENTRACE.laps_in_race + " laps (" +
+      CURRENTRACE.laps_to_go + " laps to go)" + "<br>"
+    divraceinfo.innerHTML += getFlagData(CURRENTRACE.flag_state) + "<br>"
+    divraceinfo.innerHTML += "Stage " + CURRENTRACE.stage.stage_num + "<br>"
 
 
     //vehicles live running order table
@@ -466,15 +451,9 @@ function getStages() {
 
 
 
-function getFlagData() {
-  fetch("https://cf.nascar.com/live/feeds/live-flag-data.json").then(function(item) {
-    return item.json()
-  }).then(function(item) {
-    var flagstatus = item[item.length - 1]
-    //console.log("FLAG HISTOPRY", item)
+function getFlagData(flagstatus) {
 
-
-    switch (flagstatus.flag_state) {
+    switch (flagstatus) {
       case 8:
         FLAG = "🏴 black"
         break;
@@ -496,8 +475,7 @@ function getFlagData() {
         break;
     }
     //console.log("FLAG", FLAG)
-
-  })
+    return FLAG
 }
 getFlagData()
 
