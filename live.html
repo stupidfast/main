@@ -325,9 +325,9 @@ function mapPts() {
 function getHeight() {
 	var ht = window.document.body.clientHeight
   console.log(ht)
-  window.parent.postMessage("randy", ht)
-  window.parent.parent.postMessage("randy", ht)
-  window.parent.parent.parent.postMessage("randy", ht)
+  window.parent.postMessage(["randy", ht], "*")
+  window.parent.parent.postMessage(["randy", ht], "*")
+  window.parent.parent.parent.postMessage(["randy", ht], "*")
 }
 
 
