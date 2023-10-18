@@ -21,6 +21,19 @@
 
   <style id="compiled-css" type="text/css">
     
+center center {
+
+  width: 100%;
+  max-width: 290px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tbody tr:nth-child(even) {
+  background: whitesmoke;
+}
 
     /* EOS */
   </style>
@@ -31,16 +44,16 @@
 <body>
     <center>
 
-<center style="width: 100%; max-width: 290px;">
+<center>
 <div id="divraceinfo"></div>
     <br>
 
-    <table border>
+    <table>
       <tbody id="tcurrentrace"></tbody>
     </table>
 
     <h4>Live race feed: </h4>
-    <table border>
+    <table>
       <thead>
         <tr>
           <th>Lap</th>
@@ -54,7 +67,7 @@
 
 
     <h4>Stage results:</h4>
-    <table border>
+    <table>
       <thead>
         <tr id="shead">
           <th>Pos</th>
@@ -324,8 +337,11 @@ function mapPts() {
 }
 
 function getHeight() {
-	var ht = window.document.body.clientHeight + 100
-  window.parent.parent.postMessage(ht, "*")
+	var ht = window.document.body.clientHeight
+  console.log(ht)
+  window.parent.postMessage("randy", ht)
+  window.parent.parent.postMessage("randy", ht)
+  window.parent.parent.parent.postMessage("randy", ht)
 }
 
 
@@ -334,7 +350,18 @@ function getHeight() {
 
   //]]></script>
 
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "gsjhLxr4"
+      }], "*")
+    }
 
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
 
 
 </body>
