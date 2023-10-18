@@ -307,11 +307,9 @@ function buildTable() {
     tr.insertCell().innerHTML = item.PLAYERNAME +
       " <small>(" + item.TOTAL + ")</small>"
     var td = tr.insertCell()
-    var t = document.createElement("TABLE")
     item.PICKS.forEach(function(jtem) {
-      t.insertRow().innerHTML = jtem.DRIVERNAME
+      td.innerHTML += "<div>" + jtem.DRIVERNAME + "</div>"
     })
-    td.append(t)
   })
   
   setHeight()
