@@ -22,11 +22,10 @@
   <style id="compiled-css" type="text/css">
     center center {
   max-width: 290px;
-	    width: 100%;
 }
 
 
-a {
+#links a {
   margin: 15px;
 }
 
@@ -37,7 +36,7 @@ a {
 
 table {
   border-collapse: collapse;
-  min-width: 80%;
+  min-width: 85%;
 }
 
 #tplayers > tr:nth-child(even) {
@@ -48,6 +47,9 @@ th, td {
   padding: 3px;
 }
 
+#tplayers tr {
+  height: 40px;
+}
 
     /* EOS */
   </style>
@@ -61,14 +63,14 @@ th, td {
     <br>
 
 
-    <a href="https://www.stupid-fast.com" class="banner">
+    <a href="https://www.stupid-fast.com" class="banner" width="290">
       <img src="https://www.stupid-fast.com/banner.png" width="100%">
     </a>
     <br>
 
 
-    <div id="links" style="display: inline-block;">
-    </div>
+    <center id="links">
+    </center>
     <br>
     <br>
 
@@ -159,11 +161,6 @@ function getPlayers() {
       return item.ACTIVE == "TRUE"
     })
 
-    PLAYERS.forEach(function(item) {
-      var tr = tplayers.insertRow()
-      tr.id = item.PLAYERID
-      //tr.insertCell().innerHTML = item.PLAYERID
-    })
 
     getPickOrder()
 
@@ -331,7 +328,18 @@ function setHeight() {
 
   //]]></script>
 
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "mebwpqh1"
+      }], "*")
+    }
 
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
 
 
 </body>
