@@ -86,6 +86,8 @@ th, td {
 
     <script type="text/javascript">//<![CDATA[
 
+	    var ROGER = ""
+
 
 var HOMEPAGE = []
 
@@ -318,6 +320,8 @@ function setHeight() {
 	window.addEventListener('message', function(e) {
 	console.log(e.data)
   iframe.height = e.data[1]
+		ROGER = e.data[1]
+		console.log(ROGER)
 });
 }
 
