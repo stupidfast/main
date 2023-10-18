@@ -327,7 +327,7 @@ function getHeight() {
 	var ht = window.document.body.clientHeight + 100
   //console.log(ht)
   //window.parent.postMessage(["randy", ht], "*")
-  window.parent.parent.postMessage(["randy", ht], "*")
+  window.parent.parent.postMessage(ht, "*")
   //window.parent.parent.postMessage("randy", ht)
   //window.parent.parent.parent.postMessage("randy", ht)
 }
