@@ -20,7 +20,10 @@
 
 
   <style id="compiled-css" type="text/css">
-    
+    center center {
+  max-width: 290px;
+}
+
 
 a {
   margin: 15px;
@@ -33,15 +36,17 @@ a {
 
 table {
   border-collapse: collapse;
+  min-width: 100%;
 }
 
-tr:nth-child(even) {
+#tplayers > tr:nth-child(even) {
   background: #FFC;
 }
 
 th, td {
   padding: 3px;
 }
+
 
     /* EOS */
   </style>
@@ -69,14 +74,16 @@ th, td {
 
 
     <table>
-      <tbody id="tplayers" style="width: 290px"></tbody>
+      <tbody id="tplayers" width="100%"></tbody>
     </table>
 
 
     <br><br>
-    
-    
+
+
     <iframe src="https://stupid-fast.com/live.html" frameborder="0" width="100%" height="1500" id="iframe"></iframe>
+    
+    <iframe src="https://stupid-fast.com/results.html" frameborder="0"></iframe>
 
 
   </center>
@@ -325,10 +332,20 @@ function setHeight() {
 }
 
 
-
-
   //]]></script>
 
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "mebwpqh1"
+      }], "*")
+    }
+
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
 
 
 </body>
