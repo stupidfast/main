@@ -148,8 +148,11 @@ function getLiveRace() {
     CURRENTRACE.vehicles.forEach(function(jtem) {
       var tr = tcurrentrace.insertRow()
       tr.id = "c" + jtem.vehicle_number
-      tr.insertCell().innerHTML = jtem.running_position
-      tr.insertCell().innerHTML = jtem.driver.full_name.split("(")[0] + " <small>" + Math.round(-jtem.delta * 10) / 10 + "</small>"
+      tr.insertCell().innerHTML = "<small>" + jtem.running_position + ")</small> " + jtem.driver.full_name
+      .split("(")[0]
+      .split(" Jr.")[0]
+      .split(" Jr")[0]
+      + " <small>" + Math.round(-jtem.delta * 10) / 10 + "</small>"
       //tr.insertCell().innerHTML =
     })
 
@@ -350,7 +353,18 @@ function getHeight() {
 
   //]]></script>
 
+  <script>
+    // tell the embed parent frame the height of the content
+    if (window.parent && window.parent.parent){
+      window.parent.parent.postMessage(["resultsFrame", {
+        height: document.body.getBoundingClientRect().height,
+        slug: "gsjhLxr4"
+      }], "*")
+    }
 
+    // always overwrite window.name, in case users try to set it manually
+    window.name = "result"
+  </script>
 
 
 </body>
